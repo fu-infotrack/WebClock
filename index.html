@@ -25,6 +25,7 @@
             overflow: hidden;
             -webkit-user-select: none;
             user-select: none;
+            transition: color 2s ease-in-out;
         }
 
         .clock-container {
@@ -104,6 +105,26 @@
         var noSleepVideo = document.getElementById('noSleepVideo');
         var isEnabled = false;
 
+        // Color rotation to prevent screen burn-in
+        var colors = [
+            '#ffffff', // white
+            '#00ffff', // cyan
+            '#ff00ff', // magenta
+            '#ffff00', // yellow
+            '#00ff00', // green
+            '#ff8800', // orange
+            '#88ff88', // light green
+            '#ff88ff', // light magenta
+            '#88ffff', // light cyan
+            '#ffaa00'  // amber
+        ];
+        var currentColorIndex = 0;
+
+        function rotateColor() {
+            currentColorIndex = (currentColorIndex + 1) % colors.length;
+            document.body.style.color = colors[currentColorIndex];
+        }
+
         // Update clock
         function updateClock() {
             var now = new Date();
@@ -130,6 +151,9 @@
                 document.getElementById('status').textContent = 'Screen sleep prevention active';
             }
         }
+        
+        // Rotate color every 19 seconds to prevent burn-in
+        setInterval(rotateColor, 19000);
 
         // Disable no sleep
         function disableNoSleep() {

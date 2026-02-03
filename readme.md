@@ -8,6 +8,7 @@ A full-screen digital clock web page designed for iPad Safari on iOS 12.5.8.
 - **12-hour format** with AM/PM indicator (smaller size, positioned separately)
 - **Current date display** showing weekday, month, day, and year
 - **Black background** with white text
+- **Color rotation** - font color changes every 60 seconds to prevent screen burn-in
 - **Screen sleep prevention** compatible with iOS 12.5.8 using silent video technique
 - **Responsive design** adapts to portrait and landscape orientations
 - **No seconds** - displays hours and minutes only
