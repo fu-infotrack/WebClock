@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>Digital Clock</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .clock-container {
+            text-align: center;
+            width: 100%;
+            position: relative;
+        }
+
+        .time {
+            font-size: 35vw;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            display: inline-block;
+        }
+
+        .ampm {
+            font-size: 0.25em;
+            position: absolute;
+            right: -0.8em;
+            top: 0.2em;
+        }
+
+        .date {
+            font-size: 5vw;
+            font-weight: normal;
+            letter-spacing: 0.1em;
+            opacity: 0.8;
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+
+        .wake-lock-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            opacity: 0.3;
+            padding: 5px 10px;
+        }
+
+        @media (orientation: landscape) {
+            .time {
+                font-size: 18vw;
+            }
+            .date {
+                font-size: 3vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="clock-container">
+        <div class="time" id="time">00:00:00</div>
+        <div class="date" id="date">Monday, January 1, 2000</div>
+    </div>
+    <div class="wake-lock-status" id="status">Tap to activate</div>
+
+    <!-- Invisible video to prevent screen sleep on older iOS -->
+    <video id="noSleepVideo" playsinline loop muted style="position: fixed; left: -1px; top: -1px; width: 1px; height: 1px; opacity: 0.01;">
+        <source type="video/mp4" src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAu1tZGF0AAACrQYF//+p3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE1NSByMjkwMSA3ZDBmZjIyIC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAxOCAtIGh0dHA6Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTEgcmVmPTMgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MzoweDExMyBtZT1oZXggc3VibWU9NyBwc3k9MSBwc3lfcmQ9MS4wMDowLjAwIG1peGVkX3JlZj0xIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MSA4eDhkY3Q9MSBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0tMiB0aHJlYWRzPTEgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAgZGVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cmF5X2NvbXBhdD0wIGNvbnN0cmFpbmVkX2ludHJhPTAgYmZyYW1lcz0zIGJfcHlyYW1pZD0yIGJfYWRhcHQ9MSBiX2JpYXM9MCBkaXJlY3Q9MSB3ZWlnaHRiPTEgb3Blbl9nb3A9MCB3ZWlnaHRwPTIga2V5aW50PTI1MCBrZXlpbnRfbWluPTEgc2NlbmVjdXQ9NDAgaW50cmFfcmVmcmVzaD0wIHJjX2xvb2thaGVhZD00MCByYz1jcmYgbWJ0cmVlPTEgY3JmPTIzLjAgcWNvbXA9MC42MCBxcG1pbj0wIHFwbWF4PTY5IHFwc3RlcD00IGlwX3JhdGlvPTEuNDAgYXE9MToxLjAwAIAAAAAwZYiEAD//8m+P5OXfBeLGOf0Cz6LwH9pR8f/44wL+CAADmBJAADmBJAADmBJAACGQAAAANQZokbEFf/xUAAAAMAAAH0ZgQAAAMAAAH0ZgQAAADAAAAAAAAAABEQAAAABRBAAAAAAAFAAAAGQAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAACoAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAABhpb2RzAAAAABCAgIASAAAAABD////+/wAAAjJtcmFrAAAAHHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAACDG1kaWEAAAAgbWRoZAAAAAAAAAAAAAAAAAAAKAAAABAAAAAAAAAARWJoZHIAAAAAAAAAAG1pbGUAAAAAAAAAAAAAAAEAAAABdW5lcgAAABV1cmwgAAAAAQAAADVzdGJsAAAAnXN0c2QAAAAAAAAAAQAAAI1hdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAACAACAAASAAAAEgAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABj//wAAADFhdmNDAWQACv/hABlnZAAKrNlCTvy4+wAJaG0A0JaQAAAwAAAwAAPMoKGDGDOGR1FgAAAVVUlFhGIxo3D0BAAAAAdzdHRzAAAAAAAAAAEAAAABAAACxnN0c2MAAAAAAAAAAQAAAAEAAAACAAAAAXN0c3oAAAAAAAAAEwAAAAIAAAAUc3RjbwAAAAAAAAABAAAALAAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNTguNDAuMTAw"/>
+    </video>
+
+    <script>
+        var noSleepVideo = document.getElementById('noSleepVideo');
+        var isEnabled = false;
+
+        // Update clock
+        function updateClock() {
+            var now = new Date();
+            
+            // Format time
+            var hours = now.getHours();
+            var ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0 should be 12
+            var minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('time').innerHTML = hours + ':' + minutes + '<span class="ampm">' + ampm + '</span>';
+            
+            // Format date
+            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            var dateString = now.toLocaleDateString('en-US', options);
+            document.getElementById('date').textContent = dateString;
+        }
+
+        // Enable no sleep by playing video
+        function enableNoSleep() {
+            if (!isEnabled) {
+                noSleepVideo.play();
+                isEnabled = true;
+                document.getElementById('status').textContent = 'Screen sleep prevention active';
+            }
+        }
+
+        // Disable no sleep
+        function disableNoSleep() {
+            if (isEnabled) {
+                noSleepVideo.pause();
+                isEnabled = false;
+                document.getElementById('status').textContent = 'Tap to activate';
+            }
+        }
+
+        // Handle visibility change
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible' && isEnabled) {
+                noSleepVideo.play();
+            }
+        });
+
+        // Initialize
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Enable on user interaction (required for iOS)
+        document.body.addEventListener('click', enableNoSleep);
+        document.body.addEventListener('touchstart', enableNoSleep);
+    </script>
+</body>
+</html>
