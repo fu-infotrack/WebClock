@@ -34,22 +34,27 @@
         }
 
         .time {
-            font-size: 35vw;
+            font-size: 45vw;
             font-weight: bold;
             letter-spacing: 0.05em;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
             width: 90%;
             margin-left: auto;
             margin-right: auto;
-            position: relative;
             display: inline-block;
         }
 
+        .minutes-container {
+            display: inline-block;
+            position: relative;
+        }
+
         .ampm {
-            font-size: 0.25em;
+            font-size: 0.2em;
             position: absolute;
-            right: -0.8em;
-            top: 0.2em;
+            right: -1.2em;
+            bottom: 0;
+            font-weight: normal;
         }
 
         .date {
@@ -75,7 +80,7 @@
 
         @media (orientation: landscape) {
             .time {
-                font-size: 18vw;
+                font-size: 25vw;
             }
             .date {
                 font-size: 3vw;
@@ -109,7 +114,7 @@
             hours = hours % 12;
             hours = hours ? hours : 12; // 0 should be 12
             var minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('time').innerHTML = hours + ':' + minutes + '<span class="ampm">' + ampm + '</span>';
+            document.getElementById('time').innerHTML = hours + ':<span class="minutes-container"><span class="ampm">' + ampm + '</span>' + minutes + '</span>';
             
             // Format date
             var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
